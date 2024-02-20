@@ -3,6 +3,8 @@ import serial
 import rich.console
 from rich.table import Table
 from rich.live import Live
+import winsound
+import threading
 
 """
 Initiate serial connection
@@ -26,9 +28,12 @@ terminal.clear()
 """
 Table
 """
+global beep
+beep = False
 
 
 def generate_result(init: bool = False):
+    global beep
     if init:
         return Table()
     # Fetch update
@@ -57,6 +62,7 @@ def generate_result(init: bool = False):
         status_values.remove(0)
     # # Handle reset
     if len(status_values) == 0:
+        beep = False
         return Table()
     # # Fetch initial time
     base = int(status_values[0])
@@ -65,6 +71,10 @@ def generate_result(init: bool = False):
         result.add_row(
             list(status.keys())[list(status.values()).index(items)], str(items - base)
         )
+    # Beep
+    if (len(status_values) >= 1) and not beep:
+        winsound.Beep(2500, 1000)
+        beep = True
     return result
 
 
